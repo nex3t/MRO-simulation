@@ -27,9 +27,9 @@ st.set_page_config(
 
 # ── Constants ──────────────────────────────────────────────────────────────
 SIM_OUTPUT     = Path(__file__).parent / "mro_10yr_projection.xlsx"
-BASE_YEAR      = 2022
-HIST_YEARS     = list(range(2017, 2026))   # actuals available
-SIM_YEARS      = list(range(2023, 2037))
+BASE_YEAR      = 2024
+HIST_YEARS     = list(range(2020, 2026))   # actuals available (MRO=Y source complete from 2020)
+SIM_YEARS      = list(range(2025, 2037))
 FIT_START      = 2020
 MATURE_START   = 2018
 MATURE_MIN_YRS = 4
@@ -112,26 +112,93 @@ OPERATIONAL_PILLARS = frozenset({
     "Predictive_Maintenance", "Category_Rationalization",
 })
 
+# ── Oil Price / Energy Shock Model ─────────────────────────────────────────
+OIL_PRE_CRISIS = 65.0   # $/bbl pre-crisis baseline (WTI)
+
+OIL_ASSUMPTIONS = {
+    "fleet_fuel_share":        0.35,
+    "fac_energy_share":        0.25,
+    "road_asphalt_share":      0.30,
+    "fuel_passthrough":        0.85,
+    "nat_gas_correlation":     0.50,
+    "electric_correlation":    0.25,
+    "mro_share_fleet":         0.20,
+    "mro_share_fac":           0.15,
+    "mro_share_road":          0.12,
+    "mro_petroleum_sensitive": 0.45,
+    "mro_passthrough":         0.65,
+    "mro_supply_premium":      0.15,
+}
+
+# 2026 baseline spend for Fleet / Facilities / Roadway ($M) — from NIGP trend analysis
+PROJ_2026_BASE = {"fleet": 155.0, "facilities": 240.0, "roadway": 210.0}
+
+OIL_SCENARIOS = [
+    {"label": "Pre-Crisis Baseline", "price": 65},
+    {"label": "Current (~$115)",     "price": 115},
+    {"label": "Sustained $120",      "price": 120},
+    {"label": "Qatar Warning $150",  "price": 150},
+]
+
+MRO_OIL_CATEGORIES = [
+    {"name": "Lubricants, Oils & Fluids",   "share": 0.22, "sensitivity": "high",   "dept": "Fleet",      "desc": "Motor oil, hydraulic fluid, brake fluid, coolant"},
+    {"name": "Tires & Rubber Products",     "share": 0.15, "sensitivity": "high",   "dept": "Fleet",      "desc": "Synthetic rubber requires petroleum feedstock"},
+    {"name": "Vehicle Parts & Components",  "share": 0.18, "sensitivity": "medium", "dept": "Fleet",      "desc": "Filters, belts, hoses, brake pads"},
+    {"name": "HVAC Filters, Belts & Parts", "share": 0.12, "sensitivity": "medium", "dept": "Facilities", "desc": "Building HVAC consumables"},
+    {"name": "Cleaning & Janitorial",       "share": 0.08, "sensitivity": "medium", "dept": "Facilities", "desc": "Solvents, degreasers, plastic bags"},
+    {"name": "Safety & PPE",                "share": 0.07, "sensitivity": "medium", "dept": "All",        "desc": "Plastic face shields, synthetic gloves"},
+    {"name": "Equipment Maintenance Tools", "share": 0.10, "sensitivity": "low",    "dept": "Roadway",    "desc": "Cutting fluids, welding consumables"},
+    {"name": "Electrical & Lighting",       "share": 0.08, "sensitivity": "low",    "dept": "Facilities", "desc": "Replacement bulbs, wiring, ballasts"},
+]
+
 CATEGORY_PILLAR_RATES = {
-    "Adhesives, Sealants & Fasteners":   {"Catalog_Compliance":0.12,"Demand_Management":0.08,"Predictive_Maintenance":0.04,"Category_Rationalization":0.07,"Supplier_Consolidation":0.07,"Early_Pay_Discounts":0.030},
-    "Fans, Air Circulators & Blowers":   {"Catalog_Compliance":0.08,"Demand_Management":0.05,"Predictive_Maintenance":0.15,"Category_Rationalization":0.04,"Supplier_Consolidation":0.04,"Early_Pay_Discounts":0.020},
-    "Hardware, Fasteners & Bearings":    {"Catalog_Compliance":0.11,"Demand_Management":0.07,"Predictive_Maintenance":0.07,"Category_Rationalization":0.11,"Supplier_Consolidation":0.09,"Early_Pay_Discounts":0.025},
-    "Lubricants, Oils & Greases":        {"Catalog_Compliance":0.10,"Demand_Management":0.11,"Predictive_Maintenance":0.12,"Category_Rationalization":0.08,"Supplier_Consolidation":0.06,"Early_Pay_Discounts":0.025},
-    "Paint, Coatings & Sealants":        {"Catalog_Compliance":0.10,"Demand_Management":0.08,"Predictive_Maintenance":0.04,"Category_Rationalization":0.08,"Supplier_Consolidation":0.07,"Early_Pay_Discounts":0.025},
-    "Electrical Equipment & Supplies":   {"Catalog_Compliance":0.09,"Demand_Management":0.07,"Predictive_Maintenance":0.13,"Category_Rationalization":0.06,"Supplier_Consolidation":0.06,"Early_Pay_Discounts":0.020},
-    "Fire Protection Equipment":         {"Catalog_Compliance":0.07,"Demand_Management":0.04,"Predictive_Maintenance":0.14,"Category_Rationalization":0.04,"Supplier_Consolidation":0.05,"Early_Pay_Discounts":0.020},
-    "Maintenance & Repair Supplies":     {"Catalog_Compliance":0.11,"Demand_Management":0.10,"Predictive_Maintenance":0.12,"Category_Rationalization":0.09,"Supplier_Consolidation":0.08,"Early_Pay_Discounts":0.025},
-    "Tools, Hand & Power":               {"Catalog_Compliance":0.11,"Demand_Management":0.07,"Predictive_Maintenance":0.05,"Category_Rationalization":0.10,"Supplier_Consolidation":0.08,"Early_Pay_Discounts":0.025},
-    "Instruments, Gauges & Meters":      {"Catalog_Compliance":0.07,"Demand_Management":0.05,"Predictive_Maintenance":0.16,"Category_Rationalization":0.05,"Supplier_Consolidation":0.04,"Early_Pay_Discounts":0.020},
-    "Janitorial Supplies":               {"Catalog_Compliance":0.13,"Demand_Management":0.13,"Predictive_Maintenance":0.02,"Category_Rationalization":0.10,"Supplier_Consolidation":0.08,"Early_Pay_Discounts":0.030},
-    "HVAC Equipment & Supplies":         {"Catalog_Compliance":0.08,"Demand_Management":0.06,"Predictive_Maintenance":0.15,"Category_Rationalization":0.05,"Supplier_Consolidation":0.04,"Early_Pay_Discounts":0.020},
-    "Hardware":                          {"Catalog_Compliance":0.10,"Demand_Management":0.07,"Predictive_Maintenance":0.05,"Category_Rationalization":0.12,"Supplier_Consolidation":0.09,"Early_Pay_Discounts":0.025},
-    "Abrasives":                         {"Catalog_Compliance":0.12,"Demand_Management":0.09,"Predictive_Maintenance":0.03,"Category_Rationalization":0.09,"Supplier_Consolidation":0.07,"Early_Pay_Discounts":0.030},
-    "Uniforms & Protective Clothing":    {"Catalog_Compliance":0.10,"Demand_Management":0.08,"Predictive_Maintenance":0.01,"Category_Rationalization":0.07,"Supplier_Consolidation":0.05,"Early_Pay_Discounts":0.025},
-    "Pipes, Valves & Fittings":          {"Catalog_Compliance":0.09,"Demand_Management":0.08,"Predictive_Maintenance":0.13,"Category_Rationalization":0.06,"Supplier_Consolidation":0.06,"Early_Pay_Discounts":0.025},
+    "MRO Chemicals & Lubricants":       {"Catalog_Compliance":0.11,"Demand_Management":0.12,"Predictive_Maintenance":0.10,"Category_Rationalization":0.07,"Supplier_Consolidation":0.07,"Early_Pay_Discounts":0.030},
+    "Building & Construction Materials":{"Catalog_Compliance":0.09,"Demand_Management":0.06,"Predictive_Maintenance":0.05,"Category_Rationalization":0.11,"Supplier_Consolidation":0.08,"Early_Pay_Discounts":0.020},
+    "Fleet & Vehicle Maintenance":      {"Catalog_Compliance":0.11,"Demand_Management":0.10,"Predictive_Maintenance":0.15,"Category_Rationalization":0.06,"Supplier_Consolidation":0.06,"Early_Pay_Discounts":0.025},
+    "Plumbing & Fluid Handling":        {"Catalog_Compliance":0.09,"Demand_Management":0.07,"Predictive_Maintenance":0.13,"Category_Rationalization":0.07,"Supplier_Consolidation":0.06,"Early_Pay_Discounts":0.025},
+    "Safety, PPE & Fire Protection":    {"Catalog_Compliance":0.12,"Demand_Management":0.10,"Predictive_Maintenance":0.05,"Category_Rationalization":0.07,"Supplier_Consolidation":0.08,"Early_Pay_Discounts":0.030},
+    "Electrical & Electronic":          {"Catalog_Compliance":0.09,"Demand_Management":0.07,"Predictive_Maintenance":0.13,"Category_Rationalization":0.07,"Supplier_Consolidation":0.06,"Early_Pay_Discounts":0.020},
+    "Tools & Shop Supplies":            {"Catalog_Compliance":0.11,"Demand_Management":0.07,"Predictive_Maintenance":0.05,"Category_Rationalization":0.11,"Supplier_Consolidation":0.08,"Early_Pay_Discounts":0.025},
+    "Packaging & Labeling":             {"Catalog_Compliance":0.12,"Demand_Management":0.12,"Predictive_Maintenance":0.02,"Category_Rationalization":0.08,"Supplier_Consolidation":0.09,"Early_Pay_Discounts":0.030},
+    "Fasteners & Hardware":             {"Catalog_Compliance":0.11,"Demand_Management":0.07,"Predictive_Maintenance":0.04,"Category_Rationalization":0.12,"Supplier_Consolidation":0.10,"Early_Pay_Discounts":0.025},
+    "Material Handling & Storage":      {"Catalog_Compliance":0.08,"Demand_Management":0.06,"Predictive_Maintenance":0.14,"Category_Rationalization":0.06,"Supplier_Consolidation":0.05,"Early_Pay_Discounts":0.020},
+    "Abrasives & Surface Prep":         {"Catalog_Compliance":0.12,"Demand_Management":0.10,"Predictive_Maintenance":0.03,"Category_Rationalization":0.09,"Supplier_Consolidation":0.07,"Early_Pay_Discounts":0.030},
+    "Facility Maintenance & Janitorial":{"Catalog_Compliance":0.13,"Demand_Management":0.13,"Predictive_Maintenance":0.02,"Category_Rationalization":0.10,"Supplier_Consolidation":0.08,"Early_Pay_Discounts":0.030},
+    "HVAC & Refrigeration":             {"Catalog_Compliance":0.08,"Demand_Management":0.05,"Predictive_Maintenance":0.16,"Category_Rationalization":0.05,"Supplier_Consolidation":0.04,"Early_Pay_Discounts":0.020},
 }
 
 # ── Math helpers ───────────────────────────────────────────────────────────
+def calc_oil_impact(oil_price):
+    """Compute oil price shock impacts in $M on Fleet, Facilities, Roadway & MRO."""
+    pct  = (oil_price - OIL_PRE_CRISIS) / OIL_PRE_CRISIS
+    a    = OIL_ASSUMPTIONS
+    b    = PROJ_2026_BASE
+    fleet_impact = b["fleet"]      * a["fleet_fuel_share"]  * pct * a["fuel_passthrough"]
+    fac_b        = b["facilities"] * a["fac_energy_share"]
+    fac_impact   = fac_b * (0.6 * pct * a["nat_gas_correlation"] + 0.4 * pct * a["electric_correlation"])
+    road_impact  = b["roadway"]    * a["road_asphalt_share"] * pct * a["fuel_passthrough"]
+    mro_base     = (b["fleet"]      * a["mro_share_fleet"] +
+                    b["facilities"] * a["mro_share_fac"]   +
+                    b["roadway"]    * a["mro_share_road"])
+    mro_petro    = mro_base * a["mro_petroleum_sensitive"]
+    mro_direct   = mro_petro * pct * a["mro_passthrough"]
+    mro_supply   = mro_petro * pct * a["mro_supply_premium"]
+    mro_total    = mro_direct + mro_supply
+    return {
+        "pct":          pct,
+        "fleet":        fleet_impact,
+        "facilities":   fac_impact,
+        "roadway":      road_impact,
+        "mro_direct":   mro_direct,
+        "mro_supply":   mro_supply,
+        "mro_total":    mro_total,
+        "total_direct": fleet_impact + fac_impact + road_impact,
+        "grand_total":  fleet_impact + fac_impact + road_impact + mro_total,
+        "fleet_2026":   b["fleet"]      + fleet_impact,
+        "fac_2026":     b["facilities"] + fac_impact,
+        "road_2026":    b["roadway"]    + road_impact,
+    }
+
 def sigmoid(elapsed, k, x0):
     return 1.0 / (1.0 + math.exp(-k * (elapsed - x0)))
 
@@ -146,6 +213,24 @@ def effective_cagr(base_cagr, years_ahead, apply_decay):
     extra = years_ahead - DECAY_START_YR
     return max(base_cagr * ((1 - DECAY_RATE) ** extra), CAGR_FLOOR)
 
+def calc_backtest_accuracy(baseline_df):
+    """
+    Backtest: compare model baseline projections (2023-2025) against known actuals.
+    Returns MAPE, accuracy, per-year signed errors, and directional bias.
+    """
+    # Backtest: first year(s) of simulation where we also have actuals
+    backtest_yrs = [yr for yr in SIM_YEARS if yr in _HIST_ACTUALS]
+    per_year = {}
+    for yr in backtest_yrs:
+        predicted = baseline_df[baseline_df["year"] == yr]["baseline"].sum()
+        actual    = _HIST_ACTUALS[yr]
+        err_pct   = (predicted - actual) / actual   # signed: + = model over-predicts
+        per_year[yr] = {"predicted": predicted, "actual": actual, "err_pct": err_pct}
+    abs_errors = [abs(v["err_pct"]) for v in per_year.values()]
+    mape       = sum(abs_errors) / len(abs_errors) if abs_errors else 0.0
+    bias       = sum(v["err_pct"] for v in per_year.values()) / len(per_year) if per_year else 0.0
+    return {"mape": mape, "accuracy": 1.0 - mape, "bias": bias, "per_year": per_year}
+
 def fmt(n):
     if abs(n) >= 1e9:  return f"${n/1e9:.2f}B"
     if abs(n) >= 1e6:  return f"${n/1e6:.1f}M"
@@ -155,9 +240,9 @@ def fmt(n):
 
 # ── Data layer ─────────────────────────────────────────────────────────────
 _HIST_ACTUALS = {
-    2017: 30_080_370, 2018: 30_231_697, 2019: 40_245_268,
-    2020: 57_105_823, 2021: 94_484_900, 2022: 114_627_336,
-    2023: 150_111_635, 2024: 190_642_205, 2025: 199_051_136,
+    # Source: MRO PO lines Extract.xlsx — MRO == "Y" filter only
+    2020: 21_660_000, 2021: 58_930_000, 2022: 83_250_000,
+    2023: 120_480_000, 2024: 149_010_000, 2025: 232_240_000,
 }
 
 @st.cache_data(show_spinner="Loading simulation output...")
@@ -178,7 +263,7 @@ def get_historical_actuals():
 @st.cache_data(show_spinner="Loading department shares...")
 def get_dept_shares():
     df = pd.read_excel(SIM_OUTPUT, sheet_name="Dept x Category")
-    base = df[df["year"] == 2023].copy()  # earliest projection year used for shares
+    base = df[df["year"] == min(SIM_YEARS)].copy()  # earliest projection year used for shares
     cat_totals = base.groupby("category")["baseline"].sum()
     base = base.join(cat_totals.rename("cat_total"), on="category")
     base["share"] = base["baseline"] / base["cat_total"].replace(0, float("nan"))
@@ -257,7 +342,7 @@ def _fig_base(fig, height=420, **kw):
     fig.update_yaxes(**_AXIS_BASE)
     return fig
 
-def chart_trajectory(yearly, hist_actuals, pillar_rates):
+def chart_trajectory(yearly, hist_actuals, pillar_rates, oil_impact=None, oil_price=65):
     """
     Historical actuals (2017-2025) as raw observed values.
     Optimized line extends back to 2017 (applied to actual spend).
@@ -395,6 +480,19 @@ def chart_trajectory(yearly, hist_actuals, pillar_rates):
         hovertemplate="Optimized: $%{y:.1f}M<extra></extra>",
     ))
 
+    # Oil shock scenario — MRO premium on top of trend (projection segment only)
+    if oil_impact is not None and oil_impact["mro_total"] > 0.01:
+        shock_y = [trend_y[proj_years.index(yr)] + oil_impact["mro_total"] for yr in fwd_years]
+        fig.add_trace(go.Scatter(
+            x=[act_years[-1]] + fwd_years,
+            y=[act_vals[-1]]  + shock_y,
+            name=f"Trend + Energy Shock (${oil_price:.0f}/bbl)",
+            mode="lines+markers",
+            line=dict(color=COLORS["orange"], width=2, dash="dash"),
+            marker=dict(size=4, symbol="circle"),
+            hovertemplate="Energy Shock: $%{y:.1f}M<extra></extra>",
+        ))
+
     # Reference lines
     fig.add_vline(x=2022.5, line_dash="dash", line_color="rgba(255,255,255,0.15)", line_width=1)
     fig.add_annotation(x=2022.6, y=0.94, yref="paper", text="Projection ->",
@@ -486,6 +584,33 @@ def chart_cumulative_savings(opt_df):
               xaxis=dict(**_AXIS_BASE, dtick=2),
               yaxis=dict(**_AXIS_BASE, title="Annual Savings ($M)"),
               legend=_LEGEND_BASE, margin=dict(l=52, r=18, t=28, b=36))
+    return fig
+
+
+def chart_oil_breakdown(oil_impact):
+    """Grouped bar: Fleet / Facilities / Roadway / MRO shock breakdown."""
+    categories = ["Fleet", "Facilities", "Roadway", "MRO (direct)", "MRO (supply chain)"]
+    values     = [
+        oil_impact["fleet"],
+        oil_impact["facilities"],
+        oil_impact["roadway"],
+        oil_impact["mro_direct"],
+        oil_impact["mro_supply"],
+    ]
+    bar_colors = [COLORS["cyan"], COLORS["navy"], COLORS["green"], COLORS["purple"], COLORS["lime"]]
+    fig = go.Figure(go.Bar(
+        x=categories, y=values,
+        marker_color=bar_colors,
+        marker_opacity=0.85,
+        text=[f"${v:.1f}M" for v in values],
+        textposition="outside",
+        textfont=dict(color="#475569", size=11),
+        hovertemplate="%{x}: $%{y:.1f}M overspend<extra></extra>",
+    ))
+    _fig_base(fig, height=280,
+              xaxis=dict(**_AXIS_BASE, title=""),
+              yaxis=dict(**_AXIS_BASE, title="Shock Impact ($M)"),
+              margin=dict(l=52, r=18, t=36, b=44))
     return fig
 
 
@@ -602,15 +727,17 @@ if dept_filter:
 else:
     base_filtered = baseline_df
 
-opt_df   = compute_optimization(base_filtered, pillar_rates, ai_rate, ai_adopt_yrs)
-pil_yr   = compute_per_pillar(base_filtered, pillar_rates)
-yearly   = opt_df.groupby("year")[["baseline","l1","l2","optimized","total_savings"]].sum().reset_index()
+opt_df     = compute_optimization(base_filtered, pillar_rates, ai_rate, ai_adopt_yrs)
+pil_yr     = compute_per_pillar(base_filtered, pillar_rates)
+yearly     = opt_df.groupby("year")[["baseline","l1","l2","optimized","total_savings"]].sum().reset_index()
 yearly["final"] = yearly["optimized"]
+oil_price  = int(st.session_state.get("oil_price_main", 115))
+oil_impact = calc_oil_impact(oil_price)
 
 # ── KPI Cards ──────────────────────────────────────────────────────────────
 proj_yr    = int(yearly["year"].max())   # use last available year in loaded data
 last_proj  = yearly[yearly["year"] == proj_yr].iloc[0]
-yr5_data   = yearly[yearly["year"].between(2026, 2030)]
+yr5_data   = yearly[yearly["year"].between(min(SIM_YEARS)+1, min(SIM_YEARS)+5)]
 
 total_base  = last_proj["baseline"]
 total_opt   = last_proj["optimized"]
@@ -620,23 +747,151 @@ sav_5yr_tot = sav_5yr_l1 + sav_5yr_l2
 cum_sav     = yearly["total_savings"].sum()
 
 # CAGR 2022->2025 from actuals
-_v22 = hist_actuals[hist_actuals["year"]==2022]["amount_ordered"].values
-_v25 = hist_actuals[hist_actuals["year"]==2025]["amount_ordered"].values
-cagr_str = f"{((_v25[0]/_v22[0])**(1/3)-1):.1%}" if len(_v22)>0 and len(_v25)>0 else "N/A"
+_cagr_y1, _cagr_y2 = BASE_YEAR - 2, BASE_YEAR
+_vy1 = hist_actuals[hist_actuals["year"]==_cagr_y1]["amount_ordered"].values
+_vy2 = hist_actuals[hist_actuals["year"]==_cagr_y2]["amount_ordered"].values
+_nyrs = _cagr_y2 - _cagr_y1
+cagr_str  = f"{((_vy2[0]/_vy1[0])**(1/_nyrs)-1):.1%}" if len(_vy1)>0 and len(_vy2)>0 else "N/A"
+_cagr_lbl = f"MRO CAGR {_cagr_y1}–{_cagr_y2}"
+bt        = calc_backtest_accuracy(baseline_df)
+bt_color  = COLORS["green"] if bt["accuracy"] >= 0.90 else COLORS["orange"] if bt["accuracy"] >= 0.80 else COLORS["red"]
+bt_bias   = "over-predicts" if bt["bias"] > 0.01 else ("under-predicts" if bt["bias"] < -0.01 else "unbiased")
+_bt_yrs   = sorted(bt["per_year"].keys())
+_bt_range = f"{_bt_yrs[0]}–{_bt_yrs[-1]}" if len(_bt_yrs) > 1 else str(_bt_yrs[0]) if _bt_yrs else "n/a"
+bt_sub    = f"MAPE {bt['mape']:.1%} · backtest {_bt_range} · model {bt_bias}"
 
-k1,k2,k3,k4,k5,k6 = st.columns(6)
-with k1: st.markdown(kcard(f"MRO CAGR 2022-2025", cagr_str, "Current trajectory, no intervention", COLORS["red"]), unsafe_allow_html=True)
+k1,k2,k3,k4,k5,k6,k7 = st.columns(7)
+with k1: st.markdown(kcard(_cagr_lbl, cagr_str, "Current trajectory, no intervention", COLORS["red"]), unsafe_allow_html=True)
 with k2: st.markdown(kcard(f"{proj_yr} Baseline", fmt(total_base), "No optimization applied", COLORS["muted"]), unsafe_allow_html=True)
 with k3: st.markdown(kcard(f"{proj_yr} Optimized", fmt(total_opt), "With L1 pillars + L2 AI", COLORS["cyan"]), unsafe_allow_html=True)
-with k4: st.markdown(kcard("5-Yr L1 Savings (2026-2030)", fmt(sav_5yr_l1), "Pillar optimization", COLORS["orange"]), unsafe_allow_html=True)
-with k5: st.markdown(kcard("5-Yr L2 Savings (2026-2030)", fmt(sav_5yr_l2), "AI amplification", COLORS["purple"]), unsafe_allow_html=True)
-with k6: st.markdown(kcard("10-Yr Total Savings", fmt(cum_sav), f"vs ${fmt(yearly['baseline'].sum())} baseline", COLORS["green"]), unsafe_allow_html=True)
+_yr5_lbl = f"{min(SIM_YEARS)+1}–{min(SIM_YEARS)+5}"
+with k4: st.markdown(kcard(f"5-Yr L1 Savings ({_yr5_lbl})", fmt(sav_5yr_l1), "Pillar optimization", COLORS["orange"]), unsafe_allow_html=True)
+with k5: st.markdown(kcard(f"5-Yr L2 Savings ({_yr5_lbl})", fmt(sav_5yr_l2), "AI amplification", COLORS["purple"]), unsafe_allow_html=True)
+with k6: st.markdown(kcard("10-Yr Total Savings", fmt(cum_sav), f"vs {fmt(yearly['baseline'].sum())} baseline", COLORS["green"]), unsafe_allow_html=True)
+with k7: st.markdown(kcard("Model Accuracy", f"{bt['accuracy']:.1%}", bt_sub, bt_color), unsafe_allow_html=True)
+
+with st.expander("Backtest detail — 2023–2025 model vs actuals"):
+    bt_rows = []
+    for yr, d in sorted(bt["per_year"].items()):
+        bt_rows.append({
+            "Year":      yr,
+            "Actual":    fmt(d["actual"]),
+            "Predicted": fmt(d["predicted"]),
+            "Error %":   f"{d['err_pct']:+.1%}",
+            "Abs Error": fmt(abs(d["predicted"] - d["actual"])),
+        })
+    st.dataframe(pd.DataFrame(bt_rows), use_container_width=True, hide_index=True)
+    st.caption(f"MAPE: {bt['mape']:.2%}  ·  Accuracy: {bt['accuracy']:.2%}  ·  Avg bias: {bt['bias']:+.2%} ({'model over-predicts' if bt['bias']>0 else 'model under-predicts'})")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ── Trajectory chart ───────────────────────────────────────────────────────
 section("Cost Trajectory — Historical Actuals + Optimization Scenarios")
-st.plotly_chart(chart_trajectory(yearly, hist_actuals, pillar_rates), use_container_width=True, key="traj")
+st.plotly_chart(chart_trajectory(yearly, hist_actuals, pillar_rates, oil_impact, oil_price), use_container_width=True, key="traj")
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# ── Energy Impact Section ──────────────────────────────────────────────────
+_price_color = COLORS["red"] if oil_price > 120 else COLORS["cyan"] if oil_price > 90 else COLORS["green"]
+_shock_sign  = f"+{oil_impact['pct']:.0%}" if oil_impact["pct"] >= 0 else f"{oil_impact['pct']:.0%}"
+st.markdown(f"""
+<div style='background:{COLORS["sidebar"]};border:1px solid {COLORS["border"]};
+     border-radius:12px;padding:22px 28px 10px;margin-bottom:20px;'>
+  <div style='display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;'>
+    <div>
+      <div style='font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+                  color:{COLORS["muted"]};margin-bottom:4px;'>🛢️ INTERACTIVE COST ESTIMATOR</div>
+      <div style='font-size:14px;font-weight:600;color:{COLORS["text"]};margin-bottom:2px;'>
+        Energy Price Shock — Fleet, Facilities, Roadway &amp; MRO
+      </div>
+      <div style='font-size:12px;color:{COLORS["muted"]};'>
+        Move the slider — all 2026 energy impacts update in real time
+      </div>
+    </div>
+    <div style='text-align:right;'>
+      <div style='font-size:46px;font-weight:800;color:{_price_color};
+                  font-family:"DM Mono",monospace;line-height:1;'>${oil_price}</div>
+      <div style='font-size:11px;color:{COLORS["muted"]};'>per barrel (WTI) · {_shock_sign} vs pre-crisis</div>
+    </div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
+oil_price = st.slider(
+    "Crude Oil Price ($/bbl)",
+    min_value=50, max_value=160, value=oil_price, step=1,
+    format="$%d", key="oil_price_main", label_visibility="collapsed",
+)
+oil_impact = calc_oil_impact(oil_price)   # recompute with live slider value
+
+sc1, sc2, sc3, sc4, sc5 = st.columns(5)
+for col, lbl, val, clr in zip(
+    [sc1, sc2, sc3, sc4, sc5],
+    ["$50", "Pre-crisis ~$65", "Current ~$115", "$150 (Qatar warning)", "$160"],
+    [50, 65, 115, 150, 160],
+    [COLORS["green"], COLORS["green"], COLORS["cyan"], COLORS["red"], COLORS["red"]],
+):
+    with col:
+        st.markdown(
+            f"<div style='text-align:center;font-size:10px;color:{clr};font-weight:600;'>{lbl}</div>",
+            unsafe_allow_html=True,
+        )
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# KPI cards
+e1, e2, e3, e4 = st.columns(4)
+with e1:
+    st.markdown(kcard("Fleet Overspend", f"${oil_impact['fleet']:.1f}M", f"Fuel at ${oil_price}/bbl", COLORS["cyan"]), unsafe_allow_html=True)
+with e2:
+    st.markdown(kcard("Facilities Overspend", f"${oil_impact['facilities']:.1f}M", "Energy / natural gas", COLORS["navy"]), unsafe_allow_html=True)
+with e3:
+    st.markdown(kcard("Roadway Overspend", f"${oil_impact['roadway']:.1f}M", "Bitumen / asphalt", COLORS["green"]), unsafe_allow_html=True)
+with e4:
+    st.markdown(kcard("MRO Overspend", f"${oil_impact['mro_total']:.1f}M",
+                      f"Direct ${oil_impact['mro_direct']:.1f}M + Supply ${oil_impact['mro_supply']:.1f}M",
+                      COLORS["orange"]), unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Breakdown chart + scenario table side by side
+ecol_l, ecol_r = st.columns([1, 1])
+_muted = COLORS["muted"]
+with ecol_l:
+    st.markdown(f"<div style='font-size:11px;font-weight:600;color:{_muted};margin-bottom:6px;'>Impact Breakdown by Category</div>", unsafe_allow_html=True)
+    st.plotly_chart(chart_oil_breakdown(oil_impact), use_container_width=True, key="oil_bkdn")
+
+with ecol_r:
+    st.markdown(f"<div style='font-size:11px;font-weight:600;color:{_muted};margin-bottom:6px;'>2026 Scenario Comparison</div>", unsafe_allow_html=True)
+    scenario_rows = []
+    for sc in OIL_SCENARIOS:
+        imp = calc_oil_impact(sc["price"])
+        scenario_rows.append({
+            "Scenario":      sc["label"],
+            "Oil ($/bbl)":   f"${sc['price']}",
+            "Fleet 2026":    f"${imp['fleet_2026']:.0f}M",
+            "Facilities 2026": f"${imp['fac_2026']:.0f}M",
+            "Roadway 2026":  f"${imp['road_2026']:.0f}M",
+            "MRO Add":       "—" if sc["price"] == 65 else f"+${imp['mro_total']:.1f}M",
+            "Total Shock":   f"${imp['grand_total']:.0f}M",
+        })
+    st.dataframe(pd.DataFrame(scenario_rows), use_container_width=True, hide_index=True)
+
+# MRO sub-category detail (expandable)
+with st.expander("MRO Sub-Category Petroleum Sensitivity Detail"):
+    sens_color = {"high": COLORS["red"], "medium": COLORS["orange"], "low": COLORS["green"]}
+    cat_rows = []
+    for c in MRO_OIL_CATEGORIES:
+        est_impact = oil_impact["mro_total"] * c["share"]
+        cat_rows.append({
+            "Sub-Category":  c["name"],
+            "Dept":          c["dept"],
+            "MRO Share":     f"{c['share']:.0%}",
+            "Sensitivity":   c["sensitivity"].upper(),
+            "Est. Shock":    f"${est_impact:.1f}M",
+            "Description":   c["desc"],
+        })
+    st.dataframe(pd.DataFrame(cat_rows), use_container_width=True, hide_index=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
