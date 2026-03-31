@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRO Category Definitions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0f1e3d;
+  --navy-mid: #1b3a6b;
+  --navy-light: #2a5298;
+  --accent: #c8a96e;
+  --accent-pale: #f5edd8;
+  --teal: #1d9e75;
+  --teal-pale: #e1f5ee;
+  --red-pale: #fdf0f0;
+  --red-mid: #c0392b;
+  --ink: #1a1a2e;
+  --ink-mid: #3d3d5c;
+  --ink-light: #6b6b8a;
+  --rule: #e8e4dc;
+  --bg: #f9f7f3;
+  --white: #ffffff;
+  --card-bg: #ffffff;
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+.site-header {
+  background: var(--navy);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 2px solid var(--accent);
+}
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 18px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.header-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+.header-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.header-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: -.01em;
+}
+.header-meta {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.stat-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(255,255,255,.55);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.stat-pill strong { color: var(--accent); font-size: 14px; }
+
+/* ── Hero ── */
+.hero {
+  background: var(--navy);
+  padding: 72px 40px 80px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: 'MRO';
+  position: absolute;
+  right: -20px;
+  top: -30px;
+  font-family: var(--font-display);
+  font-size: 320px;
+  font-weight: 400;
+  color: rgba(255,255,255,.025);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+.hero-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 48px;
+}
+.hero-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+.hero-headline {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 5vw, 58px);
+  font-weight: 400;
+  color: #fff;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  margin-bottom: 20px;
+}
+.hero-headline em {
+  font-style: italic;
+  color: var(--accent);
+}
+.hero-sub {
+  font-size: 16px;
+  color: rgba(255,255,255,.62);
+  max-width: 560px;
+  line-height: 1.65;
+}
+.hero-kpis {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.kpi-box {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 10px;
+  padding: 18px 20px;
+  min-width: 130px;
+}
+.kpi-num {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.kpi-lbl {
+  font-size: 11px;
+  color: rgba(255,255,255,.45);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+
+
+/* ── Grid ── */
+.grid-wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 40px 80px;
+}
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 20px;
+}
+
+/* ── Card ── */
+.cat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform .2s, box-shadow .2s;
+  animation: fadeUp .4s ease both;
+}
+.cat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(15,30,61,.1);
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-accent {
+  height: 4px;
+  background: var(--navy-mid);
+}
+
+.card-head {
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.card-id-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  background: var(--navy);
+  color: var(--accent);
+  padding: 4px 9px;
+  border-radius: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.card-titles { flex: 1; }
+.card-name {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.2;
+  letter-spacing: -.01em;
+  margin-bottom: 5px;
+}
+.card-nigp {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-light);
+}
+.nigp-chip {
+  display: inline-block;
+  background: #eef2fb;
+  color: var(--navy-mid);
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-right: 3px;
+  font-weight: 500;
+}
+
+.card-body { padding: 18px 24px; flex: 1; }
+
+.def-text {
+  font-size: 13.5px;
+  color: var(--ink-mid);
+  line-height: 1.65;
+  margin-bottom: 18px;
+}
+
+.section-head {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-bottom: 8px;
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.section-head::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+.tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  line-height: 1.3;
+}
+.tag-inc {
+  background: var(--teal-pale);
+  color: #085041;
+  border: 1px solid #9fe1cb;
+}
+.tag-exc {
+  background: var(--red-pale);
+  color: var(--red-mid);
+  border: 1px solid #f5c6c6;
+}
+
+.card-foot {
+  padding: 14px 24px;
+  background: #fafaf8;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.foot-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  white-space: nowrap;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.foot-text {
+  font-size: 12.5px;
+  color: var(--ink-mid);
+  line-height: 1.5;
+}
+
+.boundary-block {
+  background: #fffbf2;
+  border: 1px solid #e8d9b5;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 14px;
+}
+.boundary-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #a07830;
+  margin-bottom: 5px;
+}
+.boundary-text {
+  font-size: 12.5px;
+  color: #5a4520;
+  line-height: 1.55;
+}
+
+
+
+/* ── Footer ── */
+.site-footer {
+  background: var(--navy);
+  color: rgba(255,255,255,.4);
+  text-align: center;
+  padding: 28px 40px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+}
+.site-footer span { color: var(--accent); }
+
+@media (max-width: 768px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .hero-kpis { grid-template-columns: repeat(4, 1fr); }
+  .header-meta { display: none; }
+  .cat-grid { grid-template-columns: 1fr; }
+  .toolbar, .grid-wrap, .hero { padding-left: 20px; padding-right: 20px; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <span class="header-eyebrow">City of Chicago · DPS</span>
+      <span class="header-title">MRO Category Definitions</span>
+    </div>
+    <div class="header-meta">
+      <div class="stat-pill"><strong>13</strong> categories</div>
+      <div class="stat-pill"><strong>20</strong> NIGP classes</div>
+      <div class="stat-pill"><strong>205</strong> inc/exc rules</div>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-label">Procurement Taxonomy · Indirect Spend</div>
+      <h1 class="hero-headline">Standardized <em>MRO</em><br>Category Framework</h1>
+      <p class="hero-sub">A consolidated taxonomy of 13 Maintenance, Repair & Operations categories mapped to NIGP commodity codes, with standardized definitions, explicit inclusion/exclusion rules, and boundary guidance for procurement classification.</p>
+    </div>
+    <div class="hero-kpis">
+      <div class="kpi-box"><div class="kpi-num">13</div><div class="kpi-lbl">Categories</div></div>
+      <div class="kpi-box"><div class="kpi-num">20</div><div class="kpi-lbl">NIGP Classes</div></div>
+      <div class="kpi-box"><div class="kpi-num">205</div><div class="kpi-lbl">Rules</div></div>
+      <div class="kpi-box"><div class="kpi-num">OPEX</div><div class="kpi-lbl">Scope</div></div>
+    </div>
+  </div>
+</section>
+
+
+
+<main class="grid-wrap">
+  <div class="cat-grid" id="catGrid">
+
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  City of Chicago · Department of Procurement Services · <span>MRO Taxonomy v1.0</span> · Indirect Spend Classification Framework
+</footer>
+
+<script>
+const CATS = [
+  {
+    id:"CAT-01", name:"Abrasives & Surface Prep", nigp:["05"],
+    group:"mechanical",
+    def:"All products used to abrade, grind, sand, polish, blast, or otherwise prepare surfaces prior to or during maintenance and repair activities. Includes both bonded abrasive products and coated products, as well as loose and blasting media and wire brushes used for surface conditioning.",
+    includes:["Grinding wheels & discs","Sandpaper & abrasive cloth","Blasting media","Abrasive compounds & pastes","Wire brushes","Polishing compounds","Honing stones"],
+    excludes:["Wire brushes for cleaning → CAT-04","Paint strippers → CAT-09","Abrasive blasting machines (CAPEX)"],
+    boundary:"Use when primary purpose is surface conditioning or material removal. If product is a liquid chemical formulation, see CAT-09.",
+    spend:"Equipment overhaul, fleet bodywork, facility surface prep"
+  },
+  {
+    id:"CAT-02", name:"Building & Construction Materials", nigp:["54","75","62"],
+    group:"facility",
+    def:"Structural and surface materials consumed in the repair, renovation, and upkeep of buildings, facilities, and infrastructure. Covers architectural hardware, paint and protective coatings, metals, and building-specific maintenance materials. Applies exclusively to maintenance and repair — new construction is CAPEX.",
+    includes:["Paints, primers & coatings","Caulk & surface sealants","Architectural hardware (hinges, locks, latches)","Structural steel for repair","Floor covering replacements","Drywall & patching materials","Concrete repair compounds"],
+    excludes:["New construction (CAPEX)","Mechanical fasteners → CAT-05","Plumbing pipe → CAT-10","Electrical conduit → CAT-03"],
+    boundary:"Paint on buildings → CAT-02. Paint on equipment → CAT-09. Architectural locks & hinges → CAT-02. Mechanical bearings & couplings → CAT-05.",
+    spend:"Facility maintenance, building upkeep, deferred maintenance programs"
+  },
+  {
+    id:"CAT-03", name:"Electrical & Electronic", nigp:["34","35"],
+    group:"mechanical",
+    def:"All electrical components and non-IT electronic supplies used in the maintenance, repair, and operation of facility electrical systems and equipment. Covers wire and conduit through circuit protection, lighting, motors, and power generation. Expressly limited to operational electrical supplies — IT infrastructure is excluded.",
+    includes:["Wire & cable (THHN, control, low-voltage)","Conduit (EMT, rigid, PVC) & fittings","Circuit breakers & fuses","Lighting fixtures & LED retrofit kits","Electric motors & starters","Generators & transfer switches","Outlets, switches & panels","VFDs (variable frequency drives)"],
+    excludes:["IT hardware, servers & networking (CAPEX)","HVAC-specific electrical controls → CAT-07","Fire alarm panels → CAT-11","Security cameras (CAPEX/IT)"],
+    boundary:"Standalone electrical component in a building system → CAT-03. Connects to a network or runs software → IT/CAPEX.",
+    spend:"Facility electrical maintenance, lighting upgrades, motor replacements"
+  },
+  {
+    id:"CAT-04", name:"Facility Maintenance & Janitorial", nigp:["30","31","63"],
+    group:"facility",
+    def:"Consumable supplies and chemical formulations used in the routine cleaning, sanitation, and day-to-day upkeep of facilities. Encompasses manual cleaning implements, cleaning compounds and disinfectants, and janitorial consumables. Highest-frequency procurement category within facility MRO.",
+    includes:["Brooms, mops, brushes & squeegees","Degreasers & solvents","All-purpose & specialty cleaners","Disinfectants & sanitizers","Hand soaps","Paper towels, toilet paper & tissue","Trash bags & can liners","Floor wax, stripper & pads","Dispensers (paper, soap, sanitizer)"],
+    excludes:["Powered janitorial equipment (CAPEX)","Industrial process chemicals → CAT-09","PPE for cleaning staff → CAT-11"],
+    boundary:"Cleaning implements & compounds for facilities → CAT-04. Industrial solvents for equipment maintenance → CAT-09. Same chemical in a process/equipment context → CAT-09.",
+    spend:"Daily facility operations, janitorial contracts, public building maintenance"
+  },
+  {
+    id:"CAT-05", name:"Fasteners & Hardware", nigp:["20","28"],
+    group:"mechanical",
+    def:"Mechanical joining and structural hardware components used to assemble, secure, and maintain equipment, structures, and systems. Consolidates NIGP Classes 20 and 28 — resolving dual-classification ambiguity — covering mechanical fastening hardware, precision motion components (bearings, bushings, power transmission), and adhesives used for joining.",
+    includes:["Bolts, nuts, screws & washers","Rivets & anchors","Bearings (ball, roller, pillow block, thrust)","Bushings & sleeves","Couplings & mechanical connectors","Gaskets, o-rings & seals","Springs & retaining rings","Cable ties & rope","Adhesives & gap sealants","Shims, spacers & pins"],
+    excludes:["Architectural door & cabinet hardware → CAT-02","Pipe fittings & couplings → CAT-10","Surface protective coatings → CAT-02","Vehicle body adhesives → CAT-06"],
+    boundary:"Structural fasteners holding things together → CAT-05. Hardware for building access/security (locks, hinges) → CAT-02. Pipe couplings/flanges → CAT-10.",
+    spend:"Equipment assembly, structural repair, preventive maintenance programs"
+  },
+  {
+    id:"CAT-06", name:"Fleet & Vehicle Maintenance", nigp:["06","07","08","91"],
+    group:"fleet",
+    def:"Parts, supplies, fluids, and services required to maintain, repair, and operate government fleet vehicles and motorized equipment. Covers automotive and heavy equipment parts, body repair supplies, vehicle-specific shop tools, and contracted vehicle maintenance services. Fleet lubricants and fluids are captured here when end-use is a vehicle.",
+    includes:["Automotive & truck parts (filters, belts, hoses, brakes)","Tires & batteries","Vehicle fluids (oil, transmission, brake fluid — fleet)","Body repair materials & automotive paint","Diagnostic & shop equipment","Vehicle washing supplies","Towing & tire services","Fleet repair & maintenance contracts"],
+    excludes:["Vehicle purchases (CAPEX)","General lubricants for facility equipment → CAT-09","General hand tools → CAT-13","Fuel (separate category)"],
+    boundary:"Lubricant on fleet vehicle PO → CAT-06. Same product for facility equipment → CAT-09. Automotive paint for body repair → CAT-06. Facility paint → CAT-02.",
+    spend:"Fleet management, vehicle uptime, preventive maintenance schedules"
+  },
+  {
+    id:"CAT-07", name:"HVAC & Refrigeration", nigp:["40","43","55"],
+    group:"mechanical",
+    def:"Equipment, components, and consumable supplies required to maintain and operate heating, ventilation, air conditioning, and refrigeration systems within government facilities. Includes both primary mechanical equipment and supporting elements — filters, controls, ductwork, and replacement parts.",
+    includes:["Boilers & boiler parts","Furnaces, heat pumps & chillers","AC units (packaged, split, window)","Air handlers & coils","Ductwork & flexible duct","Diffusers, registers & grilles","Thermostats & zone controls","HVAC filters (all grades)","Dampers & louvers","Fan coil units (HVAC-integral)","Refrigerants"],
+    excludes:["New HVAC installation (CAPEX)","Standalone industrial fans → CAT-04","Non-HVAC electrical controls → CAT-03","HVAC hydronic plumbing → CAT-10"],
+    boundary:"Fan integral to air handler → CAT-07. Standalone restroom exhaust fan → CAT-04. HVAC thermostat → CAT-07. General-purpose switch → CAT-03.",
+    spend:"Building climate control, energy efficiency programs, filter maintenance contracts"
+  },
+  {
+    id:"CAT-08", name:"Material Handling & Storage", nigp:["48","86"],
+    group:"facility",
+    def:"Equipment and supplies used to move, store, and organize materials, parts, and goods within facilities and work sites. Covers storage systems, shelving, bins, carts, and dollies. Excludes large motorized material handling equipment (CAPEX) but includes the consumable and small-equipment tier used in everyday operations.",
+    includes:["Shelving & racking systems","Storage bins, totes & containers","Hand trucks & dollies","Carts (utility, platform, shop)","Lockers & storage cabinets","Pallets & skids","Strapping & stretch wrap","Work benches"],
+    excludes:["Forklifts, powered pallet jacks (CAPEX)","Office furniture (separate budget)","Tool chests & tool carts → CAT-13","Outbound packaging → CAT-10A"],
+    boundary:"Storage for maintenance/operations staff → CAT-08. Office furniture → separate budget. Tool chests → CAT-13.",
+    spend:"Warehousing operations, parts room management, tool crib organization"
+  },
+  {
+    id:"CAT-09", name:"MRO Chemicals & Lubricants", nigp:["19","67","68"],
+    group:"mechanical",
+    def:"Petroleum-derived, synthetic, and specialty chemical products used to lubricate, protect, treat, and repair equipment and systems. The highest-spend, highest-transaction-volume MRO category in Chicago PO data (Class 67 alone: 323 PO lines). Covers all lubricating oils, greases, hydraulic fluids, industrial chemicals, and MRO repair compounds.",
+    includes:["Motor oils (all SAE grades)","Gear oils & axle oils","Greases (GP, EP, high-temp, food-grade, marine)","Hydraulic fluids","Brake fluids","Anti-freeze & engine coolants","Transmission fluids","Penetrating & cutting oils","Silicone & chain lubricants","Synthetic lubricants","Repair epoxies & compounds","Grease guns & lube dispensers","Oil absorbents"],
+    excludes:["Fleet fluids on vehicle POs → CAT-06","Facility cleaning degreasers → CAT-04","Water treatment chemicals → CAT-10","Lab chemicals (science budget)"],
+    boundary:"Purchase intent determines classification. Same lubricant: fleet vehicle → CAT-06, facility equipment → CAT-09. Degreaser for equipment → CAT-09, for floor cleaning → CAT-04.",
+    spend:"Equipment PM programs, fleet lubrication, water infrastructure maintenance"
+  },
+  {
+    id:"CAT-10", name:"Plumbing & Fluid Handling", nigp:["60","56","46"],
+    group:"mechanical",
+    def:"All components used to convey, control, and contain fluids — water, gas, process fluids, and compressed air — within facility infrastructure and equipment systems. Strategically critical for Chicago DWM operations and water infrastructure maintenance.",
+    includes:["Pipe (black iron, galvanized, stainless, copper, PVC, CPVC, PEX)","Valves (ball, gate, globe, check, butterfly, solenoid, pressure reducing, relief)","Pipe fittings (elbows, couplings, flanges, unions, nipples)","Backflow preventers","Hydraulic cylinders & actuators","Pneumatic fittings & hose","Hose assemblies","Pipe insulation, hangers & supports","Pipe repair clamps","Strainers & inline filters","Fire hydrant parts"],
+    excludes:["New pipe installation projects (CAPEX)","HVAC hydronic piping → CAT-07","Water treatment chemicals → CAT-09","Plumbing fixtures (faucets, toilets) → CAT-02"],
+    boundary:"Pipe in repair/maintenance context → CAT-10. Pipe for new infrastructure → CAPEX. Valves in HVAC → CAT-07. Valves in water distribution → CAT-10.",
+    spend:"Water infrastructure maintenance, facility plumbing repairs, DWM operations"
+  },
+  {
+    id:"CAT-10A", name:"Packaging & Labeling", nigp:["20","76"],
+    group:"facility",
+    def:"Consumable packaging materials, labeling supplies, and identification products used in facility operations, maintenance workflows, and parts management. Covers materials used to contain, protect, identify, and ship goods or parts within government operations. Serves operational functions — distinct from administrative office supplies.",
+    includes:["Banding & strapping materials","Stretch wrap & shrink film","Corrugated boxes & cartons","Asset tags & barcode labels","Identification labels & marking tape","Packing materials & void fill","Parts bags & zip-lock bags"],
+    excludes:["Office paper & stationery (office budget)","Safety warning signs → CAT-11","Outbound shipping services (contracted)","Cable ties for fastening → CAT-05"],
+    boundary:"Packaging for operations/maintenance → CAT-10A. Office stationery → office budget. Labels with a safety function → CAT-11.",
+    spend:"Parts management, inventory operations, shipping & receiving"
+  },
+  {
+    id:"CAT-11", name:"Safety, PPE & Fire Protection", nigp:["44","80","89"],
+    group:"safety",
+    def:"All products that protect workers and facilities from harm — PPE worn by personnel, safety devices that control hazardous conditions, fire detection and suppression supplies, and work clothing with a protective function. Consolidates Classes 44, 80, and 89 under shared life-safety compliance governance.",
+    includes:["Hard hats & head protection","Safety glasses & face shields","Gloves (nitrile, leather, cut-resistant, chemical-resistant)","Respirators & masks","Fall protection (harnesses, lanyards)","Safety vests & high-visibility clothing","FR (flame-resistant) clothing","Chemical protective suits","Safety footwear (steel toe, EH-rated)","Gas detectors & LOTO equipment","Fire extinguishers","Sprinkler heads & suppression parts","Smoke & heat detectors","Emergency eyewash stations"],
+    excludes:["Electronic security systems (IT/CAPEX)","Work uniforms without PPE function → CAT-06","New fire suppression installation (CAPEX)","First aid kits (health services budget)"],
+    boundary:"Any glove with chemical or cut protection → CAT-11. Fire extinguisher → CAT-11. Suppression system installation → CAPEX. Security camera → IT/CAPEX.",
+    spend:"OSHA compliance, safety programs, life-safety maintenance, fire code compliance"
+  },
+  {
+    id:"CAT-13", name:"Tools & Shop Supplies", nigp:["61","65","88"],
+    group:"mechanical",
+    def:"Hand tools, power tools, precision measurement instruments, and consumable shop supplies used by maintenance, operations, and field personnel. Includes tools and the consumable accessories that support their use, plus operational field measurement instruments (gauges, meters) used by maintenance staff rather than in laboratory settings.",
+    includes:["Hand tools (wrenches, socket sets, hammers, screwdrivers, chisels)","Power tools (drills, grinders, circular saws, reciprocating saws, sanders)","Pneumatic & air tools","Measuring tapes, levels & squares","Pressure & temperature gauges","Multimeters & clamp meters","Infrared thermometers & data loggers","Flow meters & operational gas detectors","Tool boxes, belts & tool carts","Cutting tools & blades"],
+    excludes:["Lab-grade analytical instruments (science budget)","Automotive diagnostic tools → CAT-06","Capital machine tools & CNC (CAPEX)","Abrasive discs & grinding wheels → CAT-01"],
+    boundary:"Field measurement gauge used by maintenance staff → CAT-13. Same instrument in a lab → lab budget. Grinder (power tool) → CAT-13. Grinding wheel (consumable) → CAT-01.",
+    spend:"Maintenance operations, field service, shop operations, inspection programs"
+  }
+];
+
+
+
+const grid = document.getElementById("catGrid");
+CATS.forEach((cat, i) => {
+  const card = document.createElement("div");
+  card.className = "cat-card";
+  card.style.animationDelay = `${i * 45}ms`;
+  const nigpChips = cat.nigp.map(n => `<span class="nigp-chip">${n}</span>`).join("");
+  const incTags = cat.includes.map(t => `<span class="tag tag-inc">${t}</span>`).join("");
+  const excTags = cat.excludes.map(t => `<span class="tag tag-exc">${t}</span>`).join("");
+  card.innerHTML = `
+    <div class="card-accent"></div>
+    <div class="card-head">
+      <div class="card-id-badge">${cat.id}</div>
+      <div class="card-titles">
+        <div class="card-name">${cat.name}</div>
+        <div class="card-nigp">NIGP ${nigpChips}</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="def-text">${cat.def}</p>
+      <div class="section-head">Includes</div>
+      <div class="tag-cloud">${incTags}</div>
+      <div class="section-head">Excludes</div>
+      <div class="tag-cloud">${excTags}</div>
+      <div class="boundary-block">
+        <div class="boundary-label">Boundary rule</div>
+        <div class="boundary-text">${cat.boundary}</div>
+      </div>
+    </div>
+    <div class="card-foot">
+      <div class="foot-label">Spend driver</div>
+      <div class="foot-text">${cat.spend}</div>
+    </div>
+  `;
+  grid.appendChild(card);
+});
+</script>
+</body>
+</html>
